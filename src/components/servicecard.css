@@ -1,0 +1,170 @@
+/* ===== CARD ===== */
+.card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 30px 32px;
+  border: 1px solid #ede8df;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: center;
+
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Gold top accent bar */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #c8a75e, #e2c47a, #c8a75e);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow:
+    0 24px 60px rgba(200, 167, 94, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+  border-color: #ddd0b8;
+}
+
+/* ===== LEFT SIDE ===== */
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #0f172a;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+  transition: color 0.25s ease;
+}
+
+.card:hover .card-title {
+  color: #b89247;
+}
+
+.description {
+  font-size: 13.5px;
+  color: #6b7280;
+  line-height: 1.75;
+  font-weight: 400;
+}
+
+/* ===== RIGHT SIDE ===== */
+.card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.price {
+  font-size: 22px;
+  font-weight: 800;
+  color: #c8a75e;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.duration {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #9ca3af;
+  background: #f8f7f4;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid #ede8df;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+/* ===== BUTTON ===== */
+.add-btn {
+  margin-top: 14px;
+  padding: 12px 20px;
+  background: #0f172a;
+  color: #ffffff;
+  border: 2px solid #0f172a;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  width: 130px;
+  text-align: center;
+  letter-spacing: 0.4px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Gold fill sweep on hover */
+.add-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #c8a75e, #b89247);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.add-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.add-btn:hover::after {
+  transform: scaleX(1);
+}
+
+.add-btn:hover {
+  border-color: #b89247;
+  box-shadow: 0 8px 24px rgba(200, 167, 94, 0.35);
+  transform: translateY(-2px);
+}
+
+.add-btn:active {
+  transform: translateY(0);
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  .card {
+    grid-template-columns: 1fr;
+    padding: 24px 22px;
+    gap: 16px;
+  }
+
+  .card-right {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .add-btn {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .price {
+    font-size: 20px;
+  }
+}

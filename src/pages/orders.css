@@ -1,0 +1,170 @@
+.orders-container {
+  max-width: 900px;
+  margin: 100px auto 60px;
+  padding: 20px;
+}
+
+.orders-header {
+  margin-bottom: 30px;
+}
+
+.orders-header h1 {
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.orders-header p {
+  color: #666;
+}
+
+.empty-orders {
+  text-align: center;
+  padding: 60px 20px;
+  border: 1px dashed #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.shop-btn {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 18px;
+  background: #000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: 0.3s ease;
+}
+
+.shop-btn:hover {
+  background: #333;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: 0.3s ease;
+}
+
+.order-card:hover {
+  transform: translateY(-3px);
+}
+
+.order-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.order-date {
+  font-size: 14px;
+  color: #777;
+}
+
+.order-items {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.order-bottom {
+  text-align: right;
+  font-size: 16px;
+}
+
+/* STATUS BADGES */
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status.processing {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.in-progress {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.status.completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .order-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .order-bottom {
+    text-align: left;
+  }
+}
+.order-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.order-actions button {
+  padding: 6px 12px;
+  border: none;
+  background: black;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.order-actions button:hover {
+  background: #333;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+}

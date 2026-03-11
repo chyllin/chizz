@@ -1,0 +1,58 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Root Variables */
+:root {
+  --primary: #0d6efd;
+  --dark: #111;
+  --light: #fff;
+  --gray: #f5f5f5;
+
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+/* Body */
+body {
+  background: var(--light);
+  color: var(--dark);
+  min-height: 100vh;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: var(--primary);
+  transition: 0.3s;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+/* Container */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* Buttons */
+button,
+.btn {
+  padding: 10px 20px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+button:hover,
+.btn:hover {
+  opacity: 0.85;
+}

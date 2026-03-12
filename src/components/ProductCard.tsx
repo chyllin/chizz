@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useCart } from "../context/CartContext";
-import "./ProductCard.css";
+import "./productCard.css";
 
 interface ProductCardProps {
   id: string;

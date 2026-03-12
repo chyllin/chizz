@@ -15,32 +15,18 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   const handleSubmit = async () => {
     setError("");
 
     if (isLogin) {
-      if (!email || !password) {
-        setError("Please fill in all fields.");
-        return;
-      }
+      if (!email || !password) { setError("Please fill in all fields."); return; }
     } else {
-      if (!name || !email || !password || !confirmPassword) {
-        setError("Please fill in all fields.");
-        return;
-      }
-      if (password !== confirmPassword) {
-        setError("Passwords do not match.");
-        return;
-      }
-      if (password.length < 6) {
-        setError("Password must be at least 6 characters.");
-        return;
-      }
-      if (!agreed) {
-        setError("You must agree to the Terms and Privacy Policy to continue.");
-        return;
-      }
+      if (!name || !email || !password || !confirmPassword) { setError("Please fill in all fields."); return; }
+      if (password !== confirmPassword) { setError("Passwords do not match."); return; }
+      if (password.length < 6) { setError("Password must be at least 6 characters."); return; }
+      if (!agreed) { setError("You must agree to the Terms and Privacy Policy to continue."); return; }
     }
 
     setLoading(true);
@@ -55,22 +41,31 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
         password,
         options: { data: { full_name: name } },
       });
+
       if (error) {
         setError(error.message);
       } else if (data.user && data.user.identities && data.user.identities.length === 0) {
         setError("An account with this email already exists. Please sign in instead.");
       } else if (data.user) {
+        // Insert into users table
         const { data: existingUser } = await supabase
           .from("users")
           .select("id")
           .eq("id", data.user.id)
           .single();
+
         if (!existingUser) {
           await supabase.from("users").insert({ id: data.user.id, email, role: "user" });
         }
-        // Sign in immediately so navbar updates right away
-        await supabase.auth.signInWithPassword({ email, password });
-        onClose();
+
+        // Check if email confirmation is required
+        if (data.session) {
+          // Email confirmation is OFF — user is immediately logged in
+          onClose();
+        } else {
+          // Email confirmation is ON — show success message
+          setSignupSuccess(true);
+        }
       }
     }
 
@@ -90,10 +85,7 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
   };
 
   const handleReset = async () => {
-    if (!resetEmail) {
-      setError("Please enter your email address.");
-      return;
-    }
+    if (!resetEmail) { setError("Please enter your email address."); return; }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
       redirectTo: `${window.location.origin}/reset-password`,
@@ -103,34 +95,52 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
     setLoading(false);
   };
 
+  // ── SIGNUP SUCCESS VIEW ──
+  if (signupSuccess) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+          <button className="modal-close" onClick={onClose}>✕</button>
+          <div className="modal-logo">
+            <div className="modal-logo-placeholder">CD</div>
+            <span>ChizzDigital</span>
+          </div>
+          <div className="reset-success" style={{ textAlign: "center", padding: "20px 0" }}>
+            <p style={{ fontSize: "32px", marginBottom: "12px" }}>✅</p>
+            <h3 style={{ marginBottom: "8px" }}>Account Created!</h3>
+            <p style={{ color: "#555", fontSize: "14px", lineHeight: "1.6" }}>
+              We've sent a confirmation link to <strong>{email}</strong>.<br />
+              Please check your inbox and confirm your email to sign in.
+            </p>
+          </div>
+          <button className="modal-btn" onClick={onClose}>Got it</button>
+        </div>
+      </div>
+    );
+  }
+
   // ── RESET PASSWORD VIEW ──
   if (showReset) {
     return (
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-box" onClick={(e) => e.stopPropagation()}>
           <button className="modal-close" onClick={onClose}>✕</button>
-
           <div className="modal-logo">
             <div className="modal-logo-placeholder">CD</div>
             <span>ChizzDigital</span>
           </div>
-
           <h3 className="reset-title">Reset Password</h3>
-          <p className="reset-sub">
-            Enter your email and we'll send you a link to reset your password.
-          </p>
-
+          <p className="reset-sub">Enter your email and we'll send you a link to reset your password.</p>
           {error && <p className="modal-error">{error}</p>}
-
           {resetSent ? (
-            <div className="reset-success">
-              ✅ Check your email for a password reset link.
-            </div>
+            <div className="reset-success">✅ Check your email for a password reset link.</div>
           ) : (
             <>
               <div className="modal-input-group">
                 <span className="modal-input-icon">✉️</span>
                 <input
+                  id="reset-email"
+                  name="reset-email"
                   type="email"
                   placeholder="Enter your email"
                   value={resetEmail}
@@ -142,7 +152,6 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
               </button>
             </>
           )}
-
           <p className="modal-switch">
             <span onClick={() => { setShowReset(false); setError(""); setResetSent(false); }}>
               ← Back to Sign In
@@ -165,16 +174,10 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="modal-tabs">
-          <button
-            className={`modal-tab ${isLogin ? "active" : ""}`}
-            onClick={() => { setIsLogin(true); setError(""); }}
-          >
+          <button className={`modal-tab ${isLogin ? "active" : ""}`} onClick={() => { setIsLogin(true); setError(""); }}>
             Sign In
           </button>
-          <button
-            className={`modal-tab ${!isLogin ? "active" : ""}`}
-            onClick={() => { setIsLogin(false); setError(""); }}
-          >
+          <button className={`modal-tab ${!isLogin ? "active" : ""}`} onClick={() => { setIsLogin(false); setError(""); }}>
             Create Account
           </button>
         </div>
@@ -185,6 +188,9 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
           <div className="modal-input-group">
             <span className="modal-input-icon">👤</span>
             <input
+              id="signup-name"
+              name="name"
+              type="text"
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -195,6 +201,8 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
         <div className="modal-input-group">
           <span className="modal-input-icon">✉️</span>
           <input
+            id="auth-email"
+            name="email"
             type="email"
             placeholder="Enter your email"
             value={email}
@@ -205,6 +213,8 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
         <div className="modal-input-group">
           <span className="modal-input-icon">🔒</span>
           <input
+            id="auth-password"
+            name="password"
             type="password"
             placeholder="Enter your password"
             value={password}
@@ -212,12 +222,13 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
           />
         </div>
 
-        {/* Confirm Password — signup only */}
         {!isLogin && (
           <>
             <div className="modal-input-group">
               <span className="modal-input-icon">🔒</span>
               <input
+                id="auth-confirm-password"
+                name="confirmPassword"
                 type="password"
                 placeholder="Confirm your password"
                 value={confirmPassword}
@@ -232,10 +243,11 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
           </>
         )}
 
-        {/* Terms checkbox — signup only */}
         {!isLogin && (
           <label className="modal-checkbox">
             <input
+              id="auth-agree"
+              name="agreed"
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
@@ -249,7 +261,6 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
           </label>
         )}
 
-        {/* Terms text — login only */}
         {isLogin && (
           <p className="modal-terms">
             By signing in, you agree to our{" "}

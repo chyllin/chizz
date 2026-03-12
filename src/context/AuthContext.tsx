@@ -27,33 +27,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .select("role")
       .eq("id", userId)
       .single();
-    if (data) setRole(data.role);
+
+    if (data?.role) setRole(data.role);
+    else setRole("user");
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const { data: { user: freshUser } } = await supabase.auth.getUser();
-        setUser(freshUser ?? session.user);
-        fetchRole(session.user.id);
-      } else {
-        setUser(null);
+    // Get current session on load
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      const sessionUser = data.session?.user ?? null;
+
+      setUser(sessionUser);
+
+      if (sessionUser) {
+        await fetchRole(sessionUser.id);
       }
+
       setLoading(false);
-    });
+    };
 
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const { data: { user: freshUser } } = await supabase.auth.getUser();
-        setUser(freshUser ?? session.user);
-        fetchRole(session.user.id);
-      } else {
-        setUser(null);
-        setRole("user");
+    getSession();
+
+    // Listen for login/logout/signup changes
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        const sessionUser = session?.user ?? null;
+
+        setUser(sessionUser);
+
+        if (sessionUser) {
+          await fetchRole(sessionUser.id);
+        } else {
+          setRole("user");
+        }
       }
-    });
+    );
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   const logout = async () => {
